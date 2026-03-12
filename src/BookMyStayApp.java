@@ -1,5 +1,6 @@
 public class BookMyStayApp {
     public static void main(String[] args) {
-        System.out.println("Welcome to Book My Stay Application");
+        System.out.println("   Welcome to Book My Stay App   ");
+        System.out.println("Hotel Booking System Started");
     }
 }

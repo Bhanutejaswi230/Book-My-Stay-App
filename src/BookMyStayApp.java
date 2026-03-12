@@ -11,25 +11,25 @@ public class BookMyStayApp {
         void displayRoomDetails() {
             System.out.println("Room Type: " + roomType);
             System.out.println("Beds: " + beds);
-            System.out.println("Price: $" + price);
+            System.out.println("Price: " + price);
         }
     }
     // Single Room
     static class SingleRoom extends Room {
         SingleRoom() {
-            super("Single Room", 1, 100);
+            super("Single Room", 1, 3000);
         }
     }
     // Double Room
     static class DoubleRoom extends Room {
         DoubleRoom() {
-            super("Double Room", 2, 180);
+            super("Double Room", 2, 5000);
         }
     }
     // Suite Room
     static class SuiteRoom extends Room {
         SuiteRoom() {
-            super("Suite Room", 3, 300);
+            super("Suite Room", 3, 9000);
         }
     }
     public static void main(String[] args) {

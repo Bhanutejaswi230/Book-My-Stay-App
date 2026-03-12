@@ -11,89 +11,84 @@ public class BookMyStayApp {
         }
     }
     static class SingleRoom extends Room {
-        SingleRoom() { super("Single Room", 1, 100); }
+        SingleRoom() { super("Single Room",1,3000); }
     }
     static class DoubleRoom extends Room {
-        DoubleRoom() { super("Double Room", 2, 180); }
+        DoubleRoom() { super("Double Room",2,5000); }
     }
     static class SuiteRoom extends Room {
-        SuiteRoom() { super("Suite Room", 3, 300); }
+        SuiteRoom() { super("Suite Room",3,9000); }
     }
     static class RoomInventory {
-        private HashMap<String, Integer> inventory = new HashMap<>();
+        private HashMap<String,Integer> inventory = new HashMap<>();
         RoomInventory() {
-            inventory.put("Single Room", 5);
-            inventory.put("Double Room", 3);
-            inventory.put("Suite Room", 2);
+            inventory.put("Single Room",5);
+            inventory.put("Double Room",3);
+            inventory.put("Suite Room",2);
         }
-        int getAvailability(String roomType) {
-            return inventory.getOrDefault(roomType, 0);
+        int getAvailability(String roomType){
+            return inventory.getOrDefault(roomType,0);
         }
-        void decrementRoom(String roomType) {
-            inventory.put(roomType, inventory.get(roomType) - 1);
-        }
-        void displayInventory() {
-            System.out.println("\nUpdated Inventory:");
-            for (String room : inventory.keySet()) {
-                System.out.println(room + " : " + inventory.get(room));
-            }
+        void decrementRoom(String roomType){
+            inventory.put(roomType,inventory.get(roomType)-1);
         }
     }
     static class Reservation {
         String guestName;
         String roomType;
-        Reservation(String guestName, String roomType) {
+        String reservationId;
+        Reservation(String guestName,String roomType,String reservationId){
             this.guestName = guestName;
             this.roomType = roomType;
+            this.reservationId = reservationId;
         }
     }
-    static class BookingService {
-        Queue<Reservation> requestQueue = new LinkedList<>();
-        HashMap<String, Set<String>> allocatedRooms = new HashMap<>();
-        Set<String> allRoomIds = new HashSet<>();
-        RoomInventory inventory;
-        BookingService(RoomInventory inventory) {
-            this.inventory = inventory;
+    static class Service {
+        String serviceName;
+        double price;
+        Service(String serviceName,double price){
+            this.serviceName = serviceName;
+            this.price = price;
         }
-        void addRequest(Reservation r) {
-            requestQueue.add(r);
+    }
+    // Add-On Service Manager
+    static class AddOnServiceManager {
+        HashMap<String,List<Service>> reservationServices = new HashMap<>();
+        void addService(String reservationId, Service service){
+            reservationServices.putIfAbsent(reservationId,new ArrayList<>());
+            reservationServices.get(reservationId).add(service);
+
         }
-        void processRequests() {
-            while (!requestQueue.isEmpty()) {
-                Reservation r = requestQueue.poll();
-                if (inventory.getAvailability(r.roomType) > 0) {
-                    String roomId = generateRoomId(r.roomType);
-                    allRoomIds.add(roomId);
-                    allocatedRooms.putIfAbsent(r.roomType, new HashSet<>());
-                    allocatedRooms.get(r.roomType).add(roomId);
-                    inventory.decrementRoom(r.roomType);
-                    System.out.println("Reservation Confirmed");
-                    System.out.println("Guest: " + r.guestName);
-                    System.out.println("Room Type: " + r.roomType);
-                    System.out.println("Allocated Room ID: " + roomId);
-                    System.out.println();
-                } else {
-                    System.out.println("Reservation Failed for " + r.guestName +
-                            " (No rooms available for " + r.roomType + ")");
+        double calculateTotal(String reservationId){
+            double total = 0;
+            if(reservationServices.containsKey(reservationId)){
+
+                for(Service s : reservationServices.get(reservationId)){
+                    total += s.price;
                 }
+
             }
+            return total;
         }
-        String generateRoomId(String roomType) {
-            String prefix = roomType.substring(0,2).toUpperCase();
-            String roomId;
-            do {
-                roomId = prefix + new Random().nextInt(1000);
-            } while (allRoomIds.contains(roomId));
-            return roomId;
+        void displayServices(String reservationId){
+            if(!reservationServices.containsKey(reservationId)){
+                System.out.println("No services selected");
+                return;
+            }
+            System.out.println("Services for Reservation "+reservationId);
+            for(Service s : reservationServices.get(reservationId)){
+                System.out.println(s.serviceName + " - ₹" + s.price);
+            }
+            System.out.println("Total Add-On Cost: ₹" + calculateTotal(reservationId));
         }
     }
     public static void main(String[] args) {
-        RoomInventory inventory = new RoomInventory();
-        BookingService bookingService = new BookingService(inventory);
-        bookingService.addRequest(new Reservation("Alice", "Single Room"));
-        bookingService.addRequest(new Reservation("Bob", "Double Room"));
-        bookingService.addRequest(new Reservation("Charlie", "Suite Room"));
-        bookingService.processRequests();
-        inventory.displayInventory();
+        Reservation reservation =
+                new Reservation("Alice","Single Room","RES101");
+        AddOnServiceManager serviceManager = new AddOnServiceManager();
+        serviceManager.addService("RES101", new Service("Breakfast",500));
+        serviceManager.addService("RES101", new Service("Airport Pickup",1200));
+        serviceManager.addService("RES101", new Service("Extra Bed",800));
+        serviceManager.displayServices("RES101");
     }
 }
